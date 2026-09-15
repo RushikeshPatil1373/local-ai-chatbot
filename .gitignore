@@ -1,4 +1,24 @@
-# Ignore Python virtual environments
-venv/
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environment
 .venv/
-env/venv/
+venv/
+env/
+
+# Environment variables (API keys, secrets)
+.env
+.env.*
+
+# IDE settings
+.vscode/
+.idea/
+
+# Python cache and test cache
+.pytest_cache/
+.mypy_cache/
+
+# Operating system files
+.DS_Store
+Thumbs.db
