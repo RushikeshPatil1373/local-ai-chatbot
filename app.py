@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from src import config
 from src.chatbot.services import ChatbotService
+from src.chatbot.documents import extract_text
 
 logging.basicConfig(
     level=config.LOG_LEVEL,
@@ -26,7 +27,35 @@ if "chatbot" not in st.session_state:
 
 chatbot = st.session_state["chatbot"]
 
-user_input = st.chat_input("Enter your message")
+user_input = st.chat_input(
+    "Enter your message",
+    accept_file="multiple"
+)
+
+if user_input:
+    # 1. Get the text message
+    text_message = user_input.text
+
+    if text_message:
+        st.write(f"User message: {text_message}")
+
+    # 2. Get uploaded files
+    uploaded_files = user_input.files
+
+    if uploaded_files:
+        st.write(f"Total files uploaded: {len(uploaded_files)}")
+
+        for file in uploaded_files:
+            st.write(f"📁 Processing: **{file.name}**")
+            try:
+                extracted_text = extract_text(file)
+                st.write("### Extracted text")
+                st.write(extracted_text)
+            except UnicodeDecodeError:
+                st.error(
+                    f"Could not read **{file.name}**. "
+                    "The file is not valid UTF-8 text."
+                )
 
 for message in chatbot.history:
     if isinstance(message, HumanMessage):
@@ -36,8 +65,10 @@ for message in chatbot.history:
 
 if user_input:
     try:
-        chatbot.ask(user_input)
-        st.rerun()
+        if text_message:
+            response = chatbot.ask(text_message)
+            st.chat_message("assistant").write(response)
+            st.rerun()
 
     except httpx.ConnectError:
         st.error("Could not connect to Ollama. Please make sure Ollama is running.")
