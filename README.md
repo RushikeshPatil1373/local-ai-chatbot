@@ -1,123 +1,106 @@
 # Local AI Chatbot
 
-A local-first AI chatbot built with Python, LangChain, Ollama, and Streamlit. The chatbot runs locally on your machine and supports conversation history, configurable models, error handling, logging, and bounded chat history.
-
 ## Overview
 
-This project is a local AI chatbot designed to run with a locally hosted Ollama model. LangChain is used to connect the chatbot logic with the model, while Streamlit provides the web-based user interface.
+Local AI Chatbot is a Python application that connects a Streamlit chat interface to a locally hosted Ollama model through LangChain. The application keeps a bounded in-memory conversation history for the current Streamlit session and writes application logs to `chatbot.log`.
 
-### Current Features
+## Features
 
-* Local LLM inference using Ollama
-* LangChain-based chatbot service
-* Configurable model through `.env`
-* System prompt configuration
-* Conversation history using LangChain message objects
-* Bounded conversation history to prevent unlimited history growth
-* Streamlit chat interface
-* Error handling for Ollama connection failures
-* Application logging
-* Git/GitHub project structure
+### Currently implemented
 
-## Conversation History
+- Local model responses through Ollama and `ChatOllama`
+- LangChain prompt template with a fixed system prompt
+- Streamlit chat interface with text input
+- Multiple file upload in the chat input
+- UTF-8 text extraction for uploaded files
+- In-memory conversation history using LangChain `HumanMessage` and `AIMessage` objects
+- History trimming to the five most recent exchanges
+- Specific error message for Ollama connection failures
+- Logging for successful responses, history trimming, connection errors, and unexpected errors
+- Model selection through the `MODEL_NAME` environment variable
 
-The chatbot maintains conversation history inside `ChatbotService` using LangChain message objects.
-
-Each exchange contains:
-
-* `HumanMessage` for the user's input
-* `AIMessage` for the model's response
-
-The application limits stored history to a fixed number of recent exchanges so that the conversation context does not grow indefinitely.
+Uploaded file contents are currently displayed in the interface only; they are not added to the model prompt or conversation history.
 
 ## Project Structure
 
 ```text
 local-ai-chatbot/
-├── app.py
-├── requirements.txt
+├── app.py                         # Streamlit entry point and UI
+├── requirements.txt               # Currently listed Python 
 ├── README.md
 ├── .gitignore
-├── .env                 # Local configuration; not committed to Git
+├── python                         # Empty tracked file
+├── .env                           # Local configuration; ignored by 
+├── chatbot.log                    # Runtime log; ignored by Git
 ├── src/
 │   ├── __init__.py
-│   ├── config.py
+│   ├── config.py                  # Environment loading and app 
 │   └── chatbot/
 │       ├── __init__.py
-│       └──  services.py
-└── tests/  
-    └── .gitkeep
+│       ├── documents.py            # UTF-8 uploaded-file extraction
+│       ├── services.py             # Ollama/LangChain service and 
+│       └── test.py                 # Interactive console chatbot 
+└── tests/
+     └── .gitkeep                   # No automated tests currently present
 ```
 
-> `.env` is listed here to explain the local configuration file. It is ignored by Git and should not be committed to the repository.
+`venv/` may also exist locally as a virtual environment, but it is ignored by Git and is not part of the project source.
 
 ## Prerequisites
 
-* Python 3.10 or newer
-* Git
-* Ollama
-* A local Ollama model
+- Python 3.10 or newer
+- Git
+- [Ollama](https://ollama.com/) installed and running
+- An Ollama model available locally, such as `qwen2.5:1.5b`
 
-The project was developed and tested with Python 3.14.5 and Ollama.
+## Installation
 
-## Setup
+1. Clone the repository:
 
-### 1. Clone the repository
+    ```bash
+    git clone https://github.com/RushikeshPatil1373/local-ai-chatbot.git
+    cd local-ai-chatbot
+    ```
 
-```bash
-git clone https://github.com/RushikeshPatil1373/local-ai-chatbot.git
-cd local-ai-chatbot
-```
+2. Create and activate a virtual environment:
 
-### 2. Create and activate a virtual environment
+    ```bash
+    python -m venv venv
+    ```
 
-Create the virtual environment:
+    Windows PowerShell:
 
-```bash
-python -m venv venv
-```
+    ```powershell
+    venv\Scripts\Activate.ps1
+    ```
 
-Windows PowerShell:
+    Windows Command Prompt:
 
-```powershell
-venv\Scripts\Activate.ps1
-```
+    ```cmd
+    venv\Scripts\activate.bat
+    ```
 
-Windows CMD:
+3. Install the dependencies listed in the repository:
 
-```cmd
-venv\Scripts\activate.bat
-```
+    ```bash
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+    ```
 
-### 3. Upgrade pip
+    The current `requirements.txt` lists `streamlit`, `python-dotenv`, and `ollama`. The source code also imports `httpx`, `langchain-core`, and `langchain-ollama`, so install those packages if they are not already available in the environment:
 
-```bash
-python -m pip install --upgrade pip
-```
+    ```bash
+    pip install httpx langchain-core langchain-ollama
+    ```
 
-### 4. Install Python dependencies
+4. Install and start Ollama, then download a model:
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    ollama pull qwen2.5:1.5b
+    ollama list
+    ```
 
-### 5. Install and start Ollama
-
-Install Ollama and make sure the Ollama service is running.
-
-Then pull the model used by the project:
-
-```bash
-ollama pull qwen2.5:1.5b
-```
-
-You can verify that the model is available with:
-
-```bash
-ollama list
-```
-
-### 6. Configure the model
+## Configuration
 
 Create a `.env` file in the project root:
 
@@ -125,56 +108,47 @@ Create a `.env` file in the project root:
 MODEL_NAME=qwen2.5:1.5b
 ```
 
-The application reads the model name from the environment configuration.
+`src/config.py` loads this value with `python-dotenv`. If `MODEL_NAME` is not set, the application defaults to `qwen2.5:1.5b`. The system prompt, log level (`INFO`), and log filename (`chatbot.log`) are defined as constants in `src/config.py`, not loaded from `.env`.
 
-> Do not commit `.env` to Git because it is included in `.gitignore`.
+Do not commit `.env`. It is excluded by `.gitignore`.
 
-### 7. Run the chatbot
+## Running the Application
 
-From the project root:
+Start the Streamlit application from the project root:
 
 ```bash
 streamlit run app.py
 ```
 
-Streamlit will provide a local URL where you can open the chatbot in your browser.
+Open the local URL provided by Streamlit. Enter a message to send it to the configured Ollama model. You can also attach files; the current implementation extracts and displays their UTF-8 text without sending that text to the model.
 
-## Git Ignore
+## How It Works
 
-The project uses `.gitignore` to prevent local and generated files from being committed.
+1. `app.py` configures logging and initializes one `ChatbotService` in `st.session_state`.
+2. `ChatbotService` creates a LangChain `ChatPromptTemplate` containing the system prompt, prior messages, and the new user input.
+3. The prompt is passed to `ChatOllama` using the configured model name.
+4. The user prompt and model response are appended to the service history and the response is displayed in Streamlit.
+5. The UI catches Ollama connection errors separately from other unexpected errors.
 
-Important ignored files and directories include:
+## Conversation History
 
-* `venv/`
-* `.env`
-* `*.log`
-* Python cache files
-* IDE configuration files
+History is stored in memory on the `ChatbotService` instance for the active Streamlit session. Each completed exchange adds one `HumanMessage` and one `AIMessage`. After each response, `trim_history()` keeps at most ten messages, representing the five most recent exchanges. There is no database or persistent history storage, and uploaded file text is not included in the history.
 
 ## Development
 
-The chatbot logic is separated from the Streamlit UI through `ChatbotService`.
+The application code is organized into the Streamlit entry point, configuration, chatbot service, and document extraction modules. `src/chatbot/test.py` can be run as an interactive terminal chatbot and exits when the user enters `exit`.
 
-The main responsibilities are:
-
-* `app.py` — Streamlit user interface
-* `src/chatbot/services.py` — chatbot/model interaction and conversation history
-* `src/config.py` — application configuration
-* `.env` — local environment-specific configuration
+There are currently no automated tests in `tests/`; that directory contains only `.gitkeep`. Runtime logs, virtual environments, environment files, Python caches, and common IDE files are excluded by `.gitignore`.
 
 ## Future Improvements
 
-### Implemented Decisions
+- Add automated unit and integration tests
+- Add the missing runtime dependencies to `requirements.txt`
+- Send extracted document text to the model with clear file and prompt boundaries
+- Support additional document formats and extraction errors
+- Add persistent conversation storage or configurable history management
+- Improve the chat UI and deployment workflow
 
-* Conversation history is bounded using a last-N exchanges strategy (chosen over token-based trimming or summarization for simplicity at this stage)
-
-### Still Open
-
-* Automated unit and integration tests
-* Token-based history management or summarization (if last-N proves insufficient later)
-* Better UI features
-* Deployment of the application
-* Additional local model support
 ## License
 
-This project is currently for learning and development purposes. A license can be added when the project is ready for distribution.
+No license file or license declaration is currently included in the repository.
