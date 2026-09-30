@@ -45,7 +45,7 @@ local-ai-chatbot/
 │   └── chatbot/
 │       ├── __init__.py
 │       └──  services.py
-└── tests/
+└── tests/  
     └── .gitkeep
 ```
 
