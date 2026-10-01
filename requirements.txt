@@ -39,6 +39,7 @@ kubernetes==36.0.3
 langchain-core==1.5.1
 langchain-ollama==1.1.0
 langchain-protocol==0.0.18
+langchain-text-splitters==1.1.2
 langsmith==0.10.10
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
