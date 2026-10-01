@@ -24,3 +24,6 @@ env/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+#CHROMA DB
+chroma_db/

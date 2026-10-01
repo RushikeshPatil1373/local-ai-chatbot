@@ -8,3 +8,9 @@ SYSTEM_PROMPT = "You are a helpful AI assistant. Give concise and clear answers.
 
 LOG_LEVEL = "INFO"
 LOG_FILE = "chatbot.log"
+EMBEDDING_MODEL_NAME = os.getenv(
+    "EMBEDDING_MODEL_NAME",
+    "nomic-embed-text"
+)
+
+CHROMA_PATH = "./chroma_db"
