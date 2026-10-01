@@ -65,7 +65,6 @@ def test_store_embeddings_writes_chunks_and_metadata(monkeypatch):
         {"document_id": document_id, "chunk_index": 0},
         {"document_id": document_id, "chunk_index": 1},
     ]
-    return document_id
 
 
 def test_retrieve_chunks_embeds_question_and_returns_documents(monkeypatch):
