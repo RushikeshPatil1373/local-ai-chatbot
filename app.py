@@ -49,6 +49,13 @@ def process_uploaded_files(uploaded_files) -> None:
                 f"Could not read **{file.name}**. "
                 "The file is not valid UTF-8 text."
             )
+        except (httpx.ConnectError, ConnectionError):
+            st.error(
+                "Could not connect to Ollama to generate embeddings. "
+                "Please make sure Ollama is running (`ollama serve`)."
+            )
+        except Exception as error:
+            st.error(f"Error processing **{file.name}**: {error}")
 
 
 def main() -> None:
