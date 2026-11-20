@@ -38,7 +38,10 @@ def process_uploaded_files(uploaded_files) -> None:
         try:
             _, chunks, embeddings = process_document(file)
             store_embeddings(chunks, embeddings)
-            st.success("Document processed successfully. You can now ask questions about it.")
+            st.success(
+                f"✅ **{file.name}** processed successfully "
+                f"({len(chunks)} chunks). You can now ask questions about it."
+            )
         except ValueError as error:
             st.error(f"Error processing **{file.name}**: {error}")
         except UnicodeDecodeError:
